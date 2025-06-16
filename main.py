@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from scalar_fastapi import get_scalar_api_reference
 
 
@@ -58,6 +58,26 @@ def get_shipment(id: int) -> dict[str, Any]:
         return {"detail": "Given id doesn't exist!"}
 
     return shipments[id]
+
+
+@app.post("/shipment")
+def submit_shipment(content: str, weight: float) -> dict[str, int]:
+    # Validate weight
+    if weight > 25:
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="Maximum weight limit is 25 kgs"
+        )
+    # Create and assign shipment a new id
+    new_id = max(shipments.keys()) + 1
+
+    shipments[new_id] = {
+        "content": content,
+        "weight": weight,
+        "status": "placed",
+    }
+    # Return id for later use
+    return {"id": new_id}
 
 
 # Scalar API Documentation
