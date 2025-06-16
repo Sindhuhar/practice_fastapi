@@ -44,6 +44,37 @@ shipments = {
     },
 }
 
+### Patch method using query params
+@app.patch("/shipment")
+def patch_shipment(
+    # required
+    id: int,
+    # not required
+    content: str | None = None,
+    weight: float | None = None,
+    status: str | None = None,
+):
+    shipment = shipments[id]
+
+    # Update the provided fields
+    if content:
+        shipment["content"] = content
+    if weight:
+        shipment["weight"] = weight
+    if status:
+        shipment["status"] = status
+
+    # Reflect changes in datastore
+    shipments[id] = shipment
+    return shipment
+
+### Patch method using request body
+### Different url as same method exists
+@app.patch("/shipment_field")
+def patch_shipment_with_req_body(id: int, body: dict[str, Any]) -> dict[str, Any]:
+    # Update data with given fields
+    shipments[id].update(body)
+    return shipments[id]
 
 @app.get("/shipment/latest")
 def get_latest_shipment() -> dict[str, Any]:
@@ -78,6 +109,17 @@ def submit_shipment(content: str, weight: float) -> dict[str, int]:
     }
     # Return id for later use
     return {"id": new_id}
+
+@app.put("/shipment")
+def shipment_update(
+    id: int, content: str, weight: float, status: str
+) -> dict[str, Any]:
+    shipments[id] = {
+        "content": content,
+        "weight": weight,
+        "status": status,
+    }
+    return shipments[id]
 
 
 # Scalar API Documentation
