@@ -121,6 +121,14 @@ def shipment_update(
     }
     return shipments[id]
 
+### Delete a shipment by id
+@app.delete("/shipment")
+def delete_shipment(id: int) -> dict[str, str]:
+    # Remove from datastore
+    shipments.pop(id)
+
+    return {"detail": f"Shipment with id #{id} is deleted!"}
+
 
 # Scalar API Documentation
 @app.get("/scalar", include_in_schema=False)
